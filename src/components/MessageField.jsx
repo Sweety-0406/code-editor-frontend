@@ -37,7 +37,7 @@ const MessageField = ({groupId, username, userId}) =>{
             setGroupMembers(members);
         });
 
-        axios.get(`http://localhost:3000/group-members/${groupId}`)
+        axios.get(`${frontendUrl}/group-members/${groupId}`)
             .then(response => {
                 console.log(response.data);
                 setGroupMembers(response.data);
