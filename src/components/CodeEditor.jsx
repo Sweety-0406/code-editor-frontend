@@ -6,6 +6,7 @@ import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { MonacoBinding } from 'y-monaco';
 import PropTypes from 'prop-types';
+import { motion } from "framer-motion";
 
 const CodeEditor = ({ groupId }) => {
   const [language, setLanguage] = useState("javascript");
@@ -62,12 +63,17 @@ const CodeEditor = ({ groupId }) => {
 
   return (
     <div>
-      <div width={'100%'}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }} 
+        width={'100%'}
+      >
         <LanguageSelector language={language} onSelect={onSelect} />
         <div className="w-full border-2 rounded-lg overflow-hidden">
-          <div style={{ width: '100%' }} ref={editorRef} className="h-[50vh] w-full" />
+          <div style={{ width: '100%' }} ref={editorRef} className="h-[49vh] w-full" />
         </div>
-      </div>
+      </motion.div>
       {isInitialized && <Output editorRef={monacoEditorRef.current} language={language} />}
     </div>
   );

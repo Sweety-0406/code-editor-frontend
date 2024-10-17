@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Button, Text, useToast } from "@chakra-ui/react";
 import { executeCode } from "../api";
 import PropTypes from 'prop-types'
+import { motion } from "framer-motion";
 
 const Output = ({ editorRef, language }) => {
   const toast = useToast();
@@ -35,7 +36,11 @@ const Output = ({ editorRef, language }) => {
   };
 
   return (
-   <div>
+   <motion.div
+    initial={{ opacity: 0, scale: 0.5 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.5 }}
+   >
         <Box w="100%">
             <Button
                 className="my-1"
@@ -62,7 +67,7 @@ const Output = ({ editorRef, language }) => {
                 : 'Click "Run Code" to see the output here'}
             </Box>
         </Box>
-   </div>
+   </motion.div>
   );
 };
 

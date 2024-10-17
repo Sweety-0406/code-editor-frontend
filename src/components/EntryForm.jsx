@@ -2,8 +2,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
-import {v4 as uuidV4} from 'uuid'
 import toast from 'react-hot-toast';
+import { Button } from './button';
+import { auth } from '../../config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import Navbar from './Navbar';
 
 
 const schema = z.object({
@@ -14,20 +19,54 @@ const schema = z.object({
 
 const EntryForm = ()=>{
     const navigate = useNavigate()
-    const userId = uuidV4()
+    const [user, setUser] = useState(null)
 
+    useEffect(()=>{
+        console.log("mounted")
+        const unSubscribe = onAuthStateChanged(auth,async (currentUser)=>{
+            if(currentUser){ 
+                setUser(currentUser)
+                const res = await axios.post('http://localhost:3000/api/v1/users/getUser',{
+                    userId: currentUser.uid,
+                })
+                const fetchedUser = res.data.data.user
+                if(fetchedUser.userId === currentUser.uid){
+                    console.log(`/group/code-editor=true?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`)
+                    navigate(`/group/code-editor=true?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
+                }
+            }else{
+                setUser(null);
+            }
+        });
+        return ()=>unSubscribe();
+    },[])
+    
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm({
-        resolver: zodResolver(schema),
-    });
-
-    const onClickHandler = (data)=>{
-        console.log(data)
-        const { groupId, username } = data;
-        navigate(`/group?id=${groupId}&username=${username}&userId=${userId}`);
+        } = useForm({
+            resolver: zodResolver(schema),
+        });
+        
+        const onClickHandler = async (data)=>{
+            console.log(data)
+            const { groupId, username } = data;
+            console.log(user.uid)
+            try {
+                const res = await axios.post('http://localhost:3000/api/v1/users/user-entry',{
+                    userId: user?.uid,
+                    username,
+                    groupId
+                })
+                const fetchedUser = res.data.data
+                console.log(fetchedUser)
+                // navigate(`/group?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
+                // console.log(`/group/code-editor=true?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`)
+                navigate(`/group?choice=code-editor&id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     function generateRandomString(length) {
@@ -45,35 +84,41 @@ const EntryForm = ()=>{
         toast.success("GroupId is copied to clipboard. Use that.")
     }
 
+    if(!user){
+        navigate('/sign-up');
+        return;
+    }
+
     return(
-        <div className='bg-slate-900'>
+        <div className='bg-black'>
+            <Navbar />
             <div className='flex items-center justify-center h-screen '>
-                <div className='w-full max-w-[50%] text-white font-serif border-2 rounded-2xl  bg-gradient-to-b from-slate-700 p-3'>
-                    <div className="flex justify-center">
-                        <img className='w-10 h-10  rounded-lg' src="/public/code-editor-icon2.jpg" alt="" />
-                        <h1 className='items-center my-auto font-bold  ml-2 text-2xl'>Online Code Editor</h1>
-                    </div>
-                    <div className='my-2'>
-                        <hr />
-                        <hr />
-                        <hr />
+                <div className='w-96 text-white  rounded-xl shadow-lg p-8 bg-gray-800'>
+                    <div className="text-center mb-6">
+                        <img className="w-16 mx-auto mb-2"  src="/public/code-editor-icon3.jpg" alt="logo" />
+                        <h1 className="text-2xl font-semibold text-white">Online Code Editor</h1>
                     </div>
                     <form className='' onSubmit={handleSubmit(onClickHandler)}>
-                        <input placeholder='Enter GroupId'  className='w-full p-[7px] m-1 mx-auto bg-transparent border rounded-md ' {...register('groupId')} />
-                        {errors.groupId?.message && <p>{errors.groupId?.message}</p>}
-                        <input placeholder='Enter Username' className='w-full p-[7px] m-1 mx-auto bg-transparent border rounded-md' {...register('username')} />
-                        {errors.username?.message && <p>{errors.username?.message}</p>}
-                        <button className='border bg-green-500 p-1 px-2 rounded-lg mt-2' type="submit">submit</button>
+                        <div className='mb-4'>
+                            <input placeholder='Enter GroupId'  className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-indigo-500" {...register('groupId')} />
+                            {errors.groupId?.message && <p className='text-red-500 text-xs ml-1'>{errors.groupId?.message}</p>}
+                        </div>
+                        <div className='mb-4'>
+                            <input placeholder='Enter Username' className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-indigo-500" {...register('username')} />
+                            {errors.username?.message && <p className='text-red-500 text-xs ml-1'>{errors.username?.message}</p>}
+                        </div>
+                        <Button className="w-full p-4 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium shadow-md transition duration-200" type="submit">Submit</Button>
                     </form>
                     <div className='my-2 '>
-                        <hr className='bg-blue-400'/>
+                        {/* <hr className='bg-blue-400'/> */}
                         <div className='text-center mt-3'>
-                            <h1>Don&apos;t have an account? <span onClick={randomStringHandler} className='text-blue-400 cursor-pointer'>Create group</span></h1>
+                            <h1>Don&apos;t have a group? <span onClick={randomStringHandler} className='text-indigo-500 cursor-pointer'>Create group</span></h1>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     )
 }
 

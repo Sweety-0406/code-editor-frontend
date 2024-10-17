@@ -15,10 +15,10 @@ import {
   const LanguageSelector = ({ language, onSelect }) => {
     return (
         <div>
-            <div>
+            <div className="hover:shadow-md">
                 <Menu isLazy>
-                <MenuButton  className="my-1 " as={Button}>{language}</MenuButton>
-                <MenuList bg={'gray.900'}>
+                <MenuButton  className="my-1 hover:shadow-md hover:shadow-white/60" as={Button}>{language}</MenuButton>
+                <MenuList bg={'gray.900 hover:shadow-md'}>
                     {languages.map(([lang, version]) => (
                     <MenuItem
                         key={lang}
