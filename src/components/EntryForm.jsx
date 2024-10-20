@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Button } from './button';
 import { auth } from '../../config/firebase';
@@ -20,6 +20,8 @@ const schema = z.object({
 const EntryForm = ()=>{
     const navigate = useNavigate()
     const [user, setUser] = useState(null)
+    const[searchParams] = useSearchParams()
+    const choice = searchParams.get("choice")
 
     useEffect(()=>{
         console.log("mounted")
@@ -31,8 +33,9 @@ const EntryForm = ()=>{
                 })
                 const fetchedUser = res.data.data.user
                 if(fetchedUser.userId === currentUser.uid){
-                    console.log(`/group/code-editor=true?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`)
-                    navigate(`/group/code-editor=true?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
+                    // console.log(`/group/code-editor=true?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`)
+                    // navigate(`/group/code-editor=true?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
+                    navigate(`/group?choice=${choice}&id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
                 }
             }else{
                 setUser(null);
@@ -63,7 +66,7 @@ const EntryForm = ()=>{
                 console.log(fetchedUser)
                 // navigate(`/group?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
                 // console.log(`/group/code-editor=true?id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`)
-                navigate(`/group?choice=code-editor&id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
+                navigate(`/group?choice=${choice}&id=${fetchedUser.groupId}&username=${fetchedUser.username}&userId=${fetchedUser.userId}`);
         } catch (error) {
             console.log(error)
         }
@@ -84,10 +87,10 @@ const EntryForm = ()=>{
         toast.success("GroupId is copied to clipboard. Use that.")
     }
 
-    if(!user){
-        navigate('/sign-up');
-        return;
-    }
+    // if(!user){...........................................................................................................
+    //     navigate('/sign-up');
+    //     return;
+    // }
 
     return(
         <div className='bg-black'>

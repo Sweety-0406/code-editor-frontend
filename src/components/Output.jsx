@@ -43,7 +43,7 @@ const Output = ({ editorRef, language }) => {
    >
         <Box w="100%">
             <Button
-                className="my-1"
+                className="my-1 hover:bg-yellow-600"
                 variant="outline"
                 bg={"green"}
                 colorScheme="green"
@@ -64,7 +64,12 @@ const Output = ({ editorRef, language }) => {
             >
                 {output
                 ? output.map((line, i) => <Text key={i}>{line}</Text>)
-                : 'Click "Run Code" to see the output here'}
+                : (
+                    <Text className="text-gray-500">
+                      Click "Run Code" to see the output here
+                    </Text>
+                  )
+                }
             </Box>
         </Box>
    </motion.div>

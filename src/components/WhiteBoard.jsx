@@ -23,11 +23,13 @@ const WhiteBoard = ({
     const canvasRef = useRef(null);
     const contextRef = useRef(null)
     const[tool, setTool] = useState("pencil");
-    const[color, setColor] = useState("black");
+    const[color, setColor] = useState("white");
+    const[backgroundColor, setBackgroundColor] = useState('black')
     const[elements, setElements] = useState([])
     const[history, setHistory] = useState([])
     const[isRedoDisabled, setIsRedoDisabled] = useState(true)
     const[isUndoDisabled, setIsUndoDisabled] = useState(true)
+    const[isOpen, setIsOpen] = useState(false)
 
     // useEffect(()=>{
     //     if(history.length >= 1){
@@ -51,6 +53,11 @@ const WhiteBoard = ({
             setIsUndoDisabled(false)
         }
     },[elements])
+    
+    const isOpenHandler = ()=>{
+        // setIsOpen((value)=> !value)
+        setIsOpen(true)
+    }
 
     const handleClearBoard = ()=>{
         const canvas = canvasRef.current;
@@ -92,15 +99,18 @@ const WhiteBoard = ({
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }} 
-        className='mt-1  bg-white text-black border-2 pt-2 border-yellow-400 rounded-md'
+        className='mt-1  bg-black text-white border pt-2 border-purple-400 rounded-md'
     >
       {userId == hostId ?
       (
-        <div className='flex gap-2 justify-center'>
-            <div className='flex gap-3 justify-center shadow-lg px-4 py-1 rounded-2xl'>
+        <div className='flex gap-2  justify-center'>
+            <div className='flex bg-gray-900 gap-3 justify-center shadow-lg px-4 py-1 rounded-2xl'>
                 
-                <div className='flex'>
-                    <label htmlFor="pencil" className={`cursor-pointer hover:bg-blue-100 rounded-lg px-[6px] ${tool == "pencil"? "bg-blue-200 rounded-lg px-[6px] ":"bg-transparent"} `}>
+                <div 
+                    className='flex'
+                    onClick={isOpenHandler}
+                >
+                    <label htmlFor="pencil" className={`cursor-pointer hover:bg-gray-800 rounded-lg px-[6px] ${tool == "pencil"? "bg-gray-700 rounded-lg px-[6px] ":"bg-transparent"} `}>
                         <input
                             type="radio"
                             name="tool"
@@ -113,8 +123,11 @@ const WhiteBoard = ({
                     </label>
                 </div>
 
-                <div className='flex '>
-                    <label htmlFor="line" className={`cursor-pointer hover:bg-blue-100 rounded-lg px-[6px] ${tool == "line"? "bg-blue-200 rounded-lg px-[6px] ":"bg-transparent"} `} >
+                <div 
+                    className='flex'
+                    onClick={isOpenHandler}
+                >
+                    <label htmlFor="line" className={`cursor-pointer hover:bg-gray-800 rounded-lg px-[6px] ${tool == "line"? "bg-gray-700 rounded-lg px-[6px] ":"bg-transparent"} `} >
                         <input
                             type="radio"
                             name="tool"
@@ -127,8 +140,11 @@ const WhiteBoard = ({
                     </label>
                 </div>
 
-                <div className='flex'>
-                    <label htmlFor="circle" className={`cursor-pointer hover:bg-blue-100 rounded-lg px-[6px] ${tool == "circle"? "bg-blue-200 rounded-lg px-[6px] ":"bg-transparent"} `}>
+                <div 
+                    className='flex'
+                    onClick={isOpenHandler}
+                >
+                    <label htmlFor="circle" className={`cursor-pointer hover:bg-gray-800 rounded-lg px-[6px] ${tool == "circle"? "bg-gray-700 rounded-lg px-[6px] ":"bg-transparent"} `}>
                         <input
                             type="radio"
                             name="tool"
@@ -141,8 +157,11 @@ const WhiteBoard = ({
                     </label>
                 </div>
 
-                <div className='flex'>
-                    <label htmlFor="ellipse" className={`cursor-pointer hover:bg-blue-100 rounded-lg px-[6px] ${tool == "ellipse"? "bg-blue-200 rounded-lg px-[6px] ":"bg-transparent"} `}>
+                <div 
+                    className='flex'
+                    onClick={isOpenHandler}
+                >
+                    <label htmlFor="ellipse" className={`cursor-pointer hover:bg-gray-800 rounded-lg px-[6px] ${tool == "ellipse"? "bg-gray-700 rounded-lg px-[6px] ":"bg-transparent"} `}>
                         <input
                             type="radio"
                             name="tool"
@@ -151,12 +170,15 @@ const WhiteBoard = ({
                             className='hidden' 
                             onChange={(e) => setTool(e.target.value)}
                         />
-                        <TbOvalVertical className='mt-2' /> 
+                        <TbOvalVertical className='mt-1 size-6' /> 
                     </label>
                 </div>
 
-                <div className='flex'>
-                    <label htmlFor="rectangle" className={`cursor-pointer hover:bg-blue-100 rounded-lg px-[6px] ${tool == "rectangle"? "bg-blue-200 rounded-lg px-[6px] ":"bg-transparent"} `}>
+                <div 
+                    className='flex'
+                    onClick={isOpenHandler}
+                >
+                    <label htmlFor="rectangle" className={`cursor-pointer hover:bg-gray-800 rounded-lg px-[6px] ${tool == "rectangle"? "bg-gray-700 rounded-lg px-[6px] ":"bg-transparent"} `}>
                         <input
                             type="radio"
                             name="tool"
@@ -170,8 +192,7 @@ const WhiteBoard = ({
                 </div>
 
                 {/* </div> */}
-                <div className='mt-1'>
-                    {/* <label htmlFor="color">Select color</label> */}
+                {/* <div className='mt-1'>
                     <input 
                         type="color"
                         id='color'
@@ -179,15 +200,24 @@ const WhiteBoard = ({
                         className='rounded-sm ms-2 cursor-pointer'
                         onChange={(e)=> setColor(e.target.value)}
                     />
-                </div>
+                </div> */}
+                {/* <div className='mt-1'>
+                    <input 
+                        type="color"
+                        id='backgroundColor'
+                        value={backgroundColor} 
+                        className='rounded-sm ms-2 cursor-pointer'
+                        onChange={(e)=> setBackgroundColor(e.target.value)}
+                    />
+                </div> */}
                 
                 <div
                     disabled={elements.length == 0}
                     onClick={elements.length === 0 ? null : undoHandler} 
                     className={` 
-                        ${isUndoDisabled? "text-gray-500":"bg-white"} 
+                        ${isUndoDisabled? "text-gray-500":"bg-transparent"} 
                         ${isUndoDisabled? "cursor-not-allowed":"cursor-pointer"} 
-                        hover:bg-gray-300 
+                        hover:bg-gray-800 
                         py-1 
                         px-2 
                         rounded-md
@@ -200,9 +230,9 @@ const WhiteBoard = ({
                     disabled={history.length <1 }
                     onClick={history.length <1 ? null : redoHandler} 
                     className={` 
-                        ${isRedoDisabled? "text-gray-500":"bg-white"} 
-                        ${isRedoDisabled? "cursor-not-allowed":"cursor-pointer"} 
-                        hover:bg-gray-300 
+                        ${isRedoDisabled? "text-gray-500":"bg-transparent"} 
+                        ${isRedoDisabled? "cursor-not-allowed ":"cursor-pointer"} 
+                        hover:bg-gray-800 
                         py-1 
                         px-2 
                         rounded-md
@@ -213,18 +243,20 @@ const WhiteBoard = ({
                     <ImRedo2 disabled={history.length <1 }/>
                 </div>
                 
-                <div onClick={handleClearBoard} className=' py-1 px-2 rounded-md cursor-pointer hover:bg-red-200'>
+                <div onClick={handleClearBoard} className=' py-1 px-2 rounded-md cursor-pointer hover:bg-red-400 '>
                     <FcDeleteDatabase className='w-6 h-6' />
                 </div>
             </div>
 
         </div>):
       (
-        <div className=' text-xl ml-1 '>Real time white board image shared by presenter</div>
+        <div className=' text-xl ml-1 text-gray-400'>Real time white board image shared by presenter</div>
       )
       }
-      <div className='mt-2'>
+      <div className='mt-2'> 
         <Board 
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
             canvasRef={canvasRef} 
             contextRef={contextRef} 
             elements={elements} 

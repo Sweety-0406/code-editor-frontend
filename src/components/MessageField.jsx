@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 
-const MessageField = ({hostId, setHostId, groupId, username, userId, socket, setSocket, onClickHandler, isOpen, choice}) =>{
+const MessageField = ({hostId, setHostId, groupId, username, userId, socket, setSocket, choice}) =>{
     const [data, setData] = useState([]);
     const naviagation = useNavigate()
     const [inputValue, setInputValue] = useState('');
@@ -61,7 +61,7 @@ const MessageField = ({hostId, setHostId, groupId, username, userId, socket, set
 
         axios.get(`${frontendUrl}/group-members/${groupId}`)
             .then(response => {
-                // console.log(response.data);
+                console.log(response.data);
                 setGroupMembers(response.data);
             })
             .catch(error => {
@@ -109,11 +109,10 @@ const MessageField = ({hostId, setHostId, groupId, username, userId, socket, set
                     ${choice=='chat'?"grid-cols-10":"grid-cols-2"}
                 `}>
                 <div className={`
-                    border-r 
                     bg-black 
                     col-span-2
                 `}>
-                    <ProfilePage  groupMembers={groupMembers} groupId={groupId} clickHandler={OnLeaveHandler} />
+                    <ProfilePage  groupMembers={groupMembers} groupId={groupId} clickHandler={OnLeaveHandler} choice={choice}/>
                 </div>
                 <div className={`
                         
@@ -126,6 +125,7 @@ const MessageField = ({hostId, setHostId, groupId, username, userId, socket, set
                             initial={{ opacity: 0,x:-10 }} // Starts off-screen to the left
                             animate={{ opacity: 1, x: 0 }} // Slides to its original position
                             transition={{ duration: 0.6 }}
+                            className='border-l-2 border-purple-300'
                         >
                             <div className='bg-gray-800'>
                                 <div className='text-xl flex mx-3 pt-3  font-serif font-bold pb-2'>
@@ -145,18 +145,41 @@ const MessageField = ({hostId, setHostId, groupId, username, userId, socket, set
                                                 className={`
                                                 px-4 
                                                 py-2
-                                                ${d.username === username ? 'text-right' : 'text-left'}
+                                                flex
+                                                ${d.username === username ? 'text-right  justify-end' : 'text-left justify-start'}
                                                 `}
                                             >
-                                                <span className=' bg-gray-700 rounded-md p-1 px-2 '>
+                                                <p className= {`
+                                                     
+                                                    ${d.username === username ? 'bg-teal-900 outgoing-bubble' : 'bg-gray-700 incoming-bubble'}
+                                                    rounded-md 
+                                                    pb-2 
+                                                    px-2
+                                                    text-left
+                                                    max-w-sm
+                                                    lg:max-w-md
+                                                    xl:max-w-lg
+                                                    break-words
+                                                    `} 
+                                                >
                                                     <strong className={`
-                                                        ${d.username === username ? 'text-blue-400 outgoing-bubble' : 'text-green-400 incoming-bubble'}`}
+                                                        ${d.username === username ? 'text-blue-400 ' : 'text-green-500 '}`}
                                                     >
-                                                        {d.username === username ? 'You' : d.username}:
+                                                        {d.username === username ? 'You: ' : d.username+": "} 
                                                     </strong> 
                                                     {d.msg}
-                                                    <span className='text-xs ml-1 '>{d.time}</span>
-                                                </span>
+                                                    <div className={`
+                                                        text-xs
+                                                        ml-1
+                                                        text-gray-400
+                                                        text-end
+                                                        -mt-[6px]
+                                                        -mb-1
+                                                          ${d.username === username?"":""}
+                                                    `}>
+                                                        {d.time}
+                                                    </div>
+                                                </p>
                                             </li>
                                         ))}
                                     </ul>

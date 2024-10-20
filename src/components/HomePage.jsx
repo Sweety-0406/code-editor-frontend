@@ -45,7 +45,7 @@ const HomePage = ()=>{
                                 <div>
                                     < IconComponent 
                                         onClick={()=>{
-                                            navigate(`/${list.toLowerCase()}`)
+                                            navigate(`/${list.toLowerCase()}?choice=${list.toLowerCase()}`)
                                         }}
                                         className={`cursor-pointer ml-2 mt-2 size-8 ${colorComponent}`}  
                                     />

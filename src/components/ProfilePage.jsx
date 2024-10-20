@@ -1,40 +1,53 @@
 
 import PropTypes from 'prop-types'
 import toast from 'react-hot-toast';
-import { CiAlignRight } from "react-icons/ci";
+import { TbDeviceImacCode } from "react-icons/tb";
+import { PiChalkboardSimpleBold } from "react-icons/pi";
+import { PiChatsCircleBold } from "react-icons/pi";
 
-const ProfilePage = ({groupId,groupMembers, clickHandler})=>{
+const ProfilePage = ({groupId,groupMembers, clickHandler, choice})=>{
     
     const copyHandler = ()=>{
         navigator.clipboard.writeText(groupId)
         toast.success("GroupId is copied to clipboard.")
     }
+    console.log(groupMembers)
 
     return(
-        <div className="m-3 mt-[2px] text-white h-screen">
+        <div className="m-1 mt-[6px] text-white h-screen">
             <div className='text-lg font-serif font-bold pb-2'>
-                <div className="flex ">
-                    <img className="w-10 h-10 rounded-md" src="/public/code-editor-icon2.jpg" alt="" />
-                    <div className='flex'>
-                        <div className="hidden xl:block ml-2 my-auto">Online Code Editor</div>
-                        <div className="block xl:hidden ml-2 my-auto">Editor</div>
-                        {/* {!isOpen && <div>
-                           <CiAlignRight 
-                                onClick={isOpenHandler}
-                                className='mt-3 ml-2 h-[20px] w-[20px] text-green-500 cursor-pointer ' 
-                            />
-                        </div>} */}
+                {choice =='code-editor' && 
+                    <div className="flex text-orange-500">
+                        <TbDeviceImacCode className='size-8' />
+                        <div className='flex '>
+                            <div className="hidden xl:block ml-2 my-auto">Online Code Editor</div>
+                            <div className="block xl:hidden ml-2 my-auto">Editor</div>
+                        </div>
                     </div>
-                </div>
+                }
+                {choice =='white-board' && 
+                    <div className="flex text-purple-500">
+                        <PiChalkboardSimpleBold className='size-8' />
+                        <div className='flex '>
+                            <div className="hidden xl:block ml-2 my-auto">White Board</div>
+                            <div className="block xl:hidden ml-2 my-auto">Board</div>
+                        </div>
+                    </div>
+                }
+                {choice =='chat' && 
+                    <div className="flex text-green-500">
+                        <PiChatsCircleBold className='size-8' />
+                        <div className='flex'>
+                            <div className=" ml-2 my-auto">Chat</div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div className=''>
+                <hr />
             </div>
             <div>
-                <hr />
-                <hr />
-                <hr />
-                <hr />
-            </div>
-            <div>
-            <div className="border-2 p-1 px-2 mt-2 font-serif overflow-y-scroll  rounded-md h-[68vh]">
+            <div className="border border-gray-500 p-1 px-2 mt-2 font-serif overflow-y-scroll scrollbar-hide  rounded-md h-[68vh]">
                 <ul className=''>
                     {groupMembers.map((member, index) => (
                         <li key={index} className='flex'>
@@ -49,10 +62,10 @@ const ProfilePage = ({groupId,groupMembers, clickHandler})=>{
                 </ul>
             </div>
             <div>
-                <button onClick={copyHandler} className="bg-green-600 hover:shadow-lg hover:shadow-black shadow-black shadow-md p-2 mt-2 items-center text-center rounded-md w-full">Copy GroupId</button>
+                <button onClick={copyHandler} className="bg-green-500/55 hover:shadow-md hover:shadow-white shadow-white shadow-sm p-2 mt-2 items-center text-center rounded-md w-full">Copy GroupId</button>
             </div>
             <div>
-                <button onClick={clickHandler} className="bg-red-500 hover:shadow-lg hover:shadow-black shadow-black shadow-md p-2 mt-2 items-center text-center rounded-md w-full">Leave Group</button>
+                <button onClick={clickHandler} className="bg-red-500/55 hover:shadow-md hover:shadow-white shadow-white shadow-sm p-2 mt-2 items-center text-center rounded-md w-full">Leave Group</button>
             </div>
             </div>
         </div>

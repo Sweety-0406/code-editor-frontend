@@ -28,13 +28,13 @@ function MainPage() {
           })
           const fetchedUser = res.data.data.user
           if(fetchedUser.userId != userId){
-            navigate('/sign-up');
+            // navigate('/sign-up');................................................................................................
           }
         } catch (error) {
-          navigate('/sign-up');
+          // navigate('/sign-up');................................................................................................
         }
       }else{
-        navigate('/sign-up');
+        // navigate('/sign-up');................................................................................................
         // setUser(null);
       }
     });
@@ -55,7 +55,7 @@ function MainPage() {
           bg-black`}>
         <MessageField onClickHandler={isOpenFun} choice={choice} isOpen={isOpen} hostId={hostId} setHostId={setHostId} socket={socket} setSocket={setSocket} groupId={groupId} username={username} userId={userId} />
         </div>
-        {choice!="chat" && <div className="col-span-8 bg-slate-700 border-l">
+        {choice!="chat" && <div className="col-span-8 bg-black border-l-2 border-purple-300">
           <CodeField hostId={hostId} socket={socket} setSocket={setSocket} groupId={groupId} userId={userId} choice={choice} />
         </div>}
       </div>

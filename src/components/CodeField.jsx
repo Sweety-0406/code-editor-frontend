@@ -86,6 +86,12 @@
 // };
  
 // export default CodeField
+
+
+
+
+
+
 import CodeEditor from "./CodeEditor"
 import PropTypes from 'prop-types'
 import { useState, useEffect } from "react";
@@ -109,12 +115,12 @@ const CodeField = (props)=>{
     
     
     return(
-        <div className="m-3 text-white">
+        <div className=" mx-1 mt-0 text-white">
             <div className="w-[100%]">
                 {props.choice == "code-editor" && 
                     <CodeEditor groupId={props.groupId} />
                 }
-                {props.choice == "board" && 
+                {props.choice == "white-board" && 
                     showComponent && (<WhiteBoard hostId={props.hostId} userId={props.userId} socket={props.socket} setSocket={props.setSocket} groupId={props.groupId} />)
                 }
 

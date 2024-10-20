@@ -5,7 +5,7 @@
   body,
   :root{
     max-height: 100%;
-    overflow: hidden;
+    /* overflow: hidden; */
   }
   @layer base {
     :root {
@@ -92,34 +92,49 @@
   }
   
   /* Triangle pointer for incoming messages (left side) */
-  .incoming-bubble::before {
-      content: '';
-      position: absolute;
-      top: -4px; /* Adjust the position to align with the bubble */
-      left: -17px; /* Puts the triangle on the left side */
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 10px;
-      transform: rotate(-90deg);
-      --tw-bg-opacity: 1;
-      border-color: transparent rgb(55 65 81 / var(--tw-bg-opacity)) transparent transparent; /* Color matches the bubble */
+  .outgoing-bubble::before {
+    content: '';
+    position: absolute;
+    right: -7px;
+    top: 0px; /* Adjust the position to align with the bubble */
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px;
+    transform: rotate(-90deg);
+    --tw-bg-opacity: 1;
+    border-color: transparent rgb(19 78 74 / var(--tw-bg-opacity)) transparent transparent; 
   }
   
   /* Triangle pointer for outgoing messages (right side) */
-  .outgoing-bubble::before {
-      content: '';
-      position: absolute;
-      top:-4px; /* Adjust the position to align with the bubble */
-      right: -66px; /* Puts the triangle on the right side */
-      width: 0;
-      height: 0;
-      transform: rotate(90deg);
-      border-style: solid;
-      border-width: 10px 10px 10px 10px;
-      --tw-bg-opacity: 1;
-      border-color: transparent transparent transparent rgb(55 65 81 / var(--tw-bg-opacity)); /* Color matches the bubble */
+  .incoming-bubble::before {
+    content: '';
+    position: absolute;
+    top:-0px;
+    left: -6px;
+    width: 0;
+    height: 0;
+    transform: rotate(90deg);
+    border-style: solid;
+    border-width: 10px 10px 10px 10px;
+    --tw-bg-opacity: 1;
+    /* border-color: transparent transparent transparent rgb(18, 235, 221);  */
+    border-color: transparent transparent transparent rgb(55 65 81 / var(--tw-bg-opacity)); 
   }
+  /* .outgoing-bubble::before {
+    content: '';
+    justify-items: end;
+    position: absolute;
+    top:-4px;
+    right: -66px; 
+    width: 0;
+    height: 0;
+    transform: rotate(90deg);
+    border-style: solid;
+    border-width: 10px 10px 10px 10px;
+    --tw-bg-opacity: 1;
+    border-color: transparent transparent transparent rgb(55 65 81 / var(--tw-bg-opacity)); 
+  } */
     
   }
 

@@ -23,8 +23,23 @@ const CodeEditor = ({ groupId }) => {
     // Create a Yjs document
     const ydoc = new Y.Doc();
 
+    console.log("groupId"+groupId)
     // Connect to a WebRTC provider
-    const provider = new WebrtcProvider(groupId, ydoc);
+    // const provider = new WebrtcProvider(groupId, ydoc);
+
+
+    const provider = new WebrtcProvider(groupId, ydoc, {
+      signaling: ['wss://signaling.yjs.dev'], // Default signaling server
+      password: 'optional-password', // Optional password for extra security
+      peerOpts: {
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' }, // Public STUN server
+          ],
+        },
+      },
+    });
+
 
     // Create a Yjs text type
     const type = ydoc.getText('monaco');
@@ -38,6 +53,23 @@ const CodeEditor = ({ groupId }) => {
 
     // Bind the Yjs text type to the Monaco Editor
     new MonacoBinding(type, editor.getModel(), new Set([editor]), provider.awareness);
+
+
+
+    provider.on('synced', (isSynced) => {
+      console.log('Is synced:', isSynced);  // Logs true or false based on sync status
+    });
+    provider.awareness.on('update', () => {
+      console.log('Peers connected:', Array.from(provider.awareness.getStates().values()));
+    });
+    
+    provider.on('connection', (status) => {
+      console.log('Connection status:', status);  // Logs connection status changes
+    }); 
+    provider.on('status', (event) => {
+      console.log('Connection status:', event.status); // Outputs: "connected" or "disconnected"
+    });   
+
 
     // Store the editor instance in the ref
     monacoEditorRef.current = editor;
@@ -70,7 +102,7 @@ const CodeEditor = ({ groupId }) => {
         width={'100%'}
       >
         <LanguageSelector language={language} onSelect={onSelect} />
-        <div className="w-full border-2 rounded-lg overflow-hidden">
+        <div className="w-full border rounded-lg border-gray-500 overflow-hidden">
           <div style={{ width: '100%' }} ref={editorRef} className="h-[49vh] w-full" />
         </div>
       </motion.div>

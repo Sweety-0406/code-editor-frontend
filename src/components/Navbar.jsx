@@ -3,10 +3,15 @@ import {LISTS} from '../constants'
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../config/firebase";
+import { useSearchParams } from "react-router-dom";
 
 const Navbar = ()=>{
     const navigate = useNavigate();
     const [user, setUser ] = useState(null)
+    const [searchParams] = useSearchParams()
+    const groupId = searchParams.get('id');
+    const username = searchParams.get('username');
+    const userId = searchParams.get('userId');
 
     useEffect(()=>{
         const unSubscribe = onAuthStateChanged(auth,async (currentUser)=>{
@@ -30,7 +35,11 @@ const Navbar = ()=>{
                         return(
                             <div className={`cursor-pointer transition duration-200 `} 
                                 onClick={()=>{
-                                    navigate(`/${list.toLowerCase()}`)
+                                    if(groupId && username && userId){
+                                        navigate(`/group?choice=${list.toLowerCase()}&id=${groupId}&username=${username}&userId=${userId}`);
+                                    }else{
+                                        navigate(`/${list.toLowerCase()}`)
+                                    }
                                 }}
                             >
                                 {list}
