@@ -122,6 +122,22 @@ const WhiteBoard = ({
                         <HiPencil className='mt-2' /> 
                     </label>
                 </div>
+                <div 
+                    className='flex'
+                    onClick={isOpenHandler}
+                >
+                    <label htmlFor="text" className={`cursor-pointer hover:bg-gray-800 rounded-lg px-[6px] ${tool == "text"? "bg-gray-700 rounded-lg px-[6px] ":"bg-transparent"} `}>
+                        <input
+                            type="radio"
+                            name="tool"
+                            id="text"
+                            value="text"
+                            className='hidden'  
+                            onChange={(e) => setTool(e.target.value)}
+                        />
+                        <HiPencil className='mt-2' /> 
+                    </label>
+                </div>
 
                 <div 
                     className='flex'
