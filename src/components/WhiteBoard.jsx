@@ -10,7 +10,8 @@ import { TbOvalVertical } from "react-icons/tb";
 import { ImUndo2 } from "react-icons/im";
 import { ImRedo2 } from "react-icons/im";
 import { FcDeleteDatabase } from "react-icons/fc";
-import { RiDeleteBin6Fill } from "react-icons/ri";
+import { IoTextSharp } from "react-icons/io5";
+import { CiText } from "react-icons/ci";
 
 
 const WhiteBoard = ({
@@ -23,8 +24,6 @@ const WhiteBoard = ({
     const canvasRef = useRef(null);
     const contextRef = useRef(null)
     const[tool, setTool] = useState("pencil");
-    const[color, setColor] = useState("white");
-    const[backgroundColor, setBackgroundColor] = useState('black')
     const[elements, setElements] = useState([])
     const[history, setHistory] = useState([])
     const[isRedoDisabled, setIsRedoDisabled] = useState(true)
@@ -135,7 +134,7 @@ const WhiteBoard = ({
                             className='hidden'  
                             onChange={(e) => setTool(e.target.value)}
                         />
-                        <HiPencil className='mt-2' /> 
+                        <CiText className='mt-2' /> 
                     </label>
                 </div>
 
@@ -278,7 +277,6 @@ const WhiteBoard = ({
             elements={elements} 
             setElements={setElements} 
             tool={tool}
-            color={color}
             socket={socket}
             setSocket={setSocket}
             groupId={groupId}

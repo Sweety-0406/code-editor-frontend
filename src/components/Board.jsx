@@ -30,30 +30,16 @@ const Board=({
   const[fontSize, setFontSize] = useState(15)
   const [fontFamily, setFontFamily] = useState("Arial");
   const fonts = ["Arial", "Times New Roman", "Georgia", "Courier New", "Verdana"];
+  const [selectedElement, setSelectedElement] = useState(null)
 
 
-  if(isOpen){
-    console.log("open")
-  }
   
   useEffect(()=>{
     socket.on("boardData",(data)=>{
       console.log(data.canvasImage)
       setImageUrl(data.canvasImage);
     })
-  },[])  
-  // useEffect(() => {
-  //   const handleBoardData = (data) => {
-  //     console.log(data.canvasImage);
-  //     setImageUrl(data.canvasImage);
-  //   };
-  
-  //   socket.on("boardData", handleBoardData);
-  
-  //   return () => {
-  //     socket.off("boardData", handleBoardData); // Clean up
-  //   };
-  // }, [socket]);
+  },[socket])  
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -70,7 +56,7 @@ const Board=({
     // if(elements.length >0){
     //   contextRef.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
     // }
-    if(elements.length > 0){
+    if(!elements || elements.length > 0){
       contextRef.current.clearRect(
         0,
         0,
@@ -87,7 +73,7 @@ const Board=({
             stroke: element.stroke,
             strokeWidth:element.strokeWidth,
             strokeLineDash:element.strokeLineDash,
-          }
+          } 
         ) 
       }
       else if(element.type == 'line'){
@@ -177,209 +163,346 @@ const Board=({
     const canvasImage = canvasRef.current.toDataURL();
     socket.emit("board",canvasImage, groupId, userId)
 
-  },[elements])
+  },[elements]) 
 
   const handleMouseDown = (e)=>{
-    const{offsetX, offsetY} = e.nativeEvent
-    console.log(offsetX, offsetY)
+    const{offsetX, offsetY} = e.nativeEvent 
 
-    if(tool == 'pencil'){
-      setElements((prevElements)=>[
-        ...prevElements,
-        {
-          type:"pencil",
-          offsetX, 
-          offsetY,
-          path:[[offsetX, offsetY]], 
-          stroke:color,
-          strokeWidth:strokeWidth,
-          strokeLineDash:strokeStyle
-        }
-      ])
-    }else if(tool == 'line'){
-      setElements((prevElements)=>[
-        ...prevElements,
-        {
-          type:"line",
-          offsetX,
-          offsetY,
-          width: offsetX,
-          height: offsetY,
-          stroke:color,
-          strokeWidth:strokeWidth,
-          strokeLineDash:strokeStyle,
-        }
-      ])
-    }else if(tool == 'circle'){
-      setElements((prevElements)=>[
-        ...prevElements,
-        {
-          type:"circle",
-          offsetX,
-          offsetY,
-          width: 0,
-          height: 0,
-          stroke:color,
-          strokeWidth:strokeWidth,
-          fill:backgroundColor,
-          fillStyle:fillStyle,
-          strokeLineDash: strokeStyle,
-          hachureGap:fillGap
-        }
-      ])
-    }else if(tool == 'ellipse'){
-      setElements((prevElements)=>[
-        ...prevElements,
-        {
-          type:"ellipse",
-          offsetX,
-          offsetY,
-          width: 0,
-          height: 0,
-          stroke:color,
-          strokeWidth:strokeWidth,
-          fill:backgroundColor,
-          fillStyle:fillStyle,
-          strokeLineDash: strokeStyle,
-          hachureGap:fillGap
-        }
-      ])
-    }else if(tool == 'rectangle'){
-      setElements((prevElements)=>[
-        ...prevElements,
-        {
-          type:"rectangle",
-          offsetX,
-          offsetY,
-          width: 0,
-          height: 0,
-          stroke:color,
-          strokeWidth:strokeWidth,
-          fill:backgroundColor,
-          fillStyle:fillStyle,
-          strokeLineDash: strokeStyle,
-          hachureGap:fillGap
-        }
-      ])
-    }else if(tool == 'text'){
-      const newText = window.prompt('Enter text:', '');
-      if (newText) {
-        setElements((prev) => [
-          ...prev,
+    const clickedElement = elements.findIndex((ele)=>{
+      if(ele.type == 'pencil'){ 
+        const minX = Math.min(...ele.path.map(point => point[0]));
+        const maxX = Math.max(...ele.path.map(point => point[0]));
+        const minY = Math.min(...ele.path.map(point => point[1]));
+        const maxY = Math.max(...ele.path.map(point => point[1]));
+
+        // Check if click is within the bounding box
+        return offsetX >= minX && offsetX <= maxX && offsetY >= minY && offsetY <= maxY;
+      }
+      else if(ele.type == 'line'){ 
+        return(
+          offsetX >=ele.offsetX &&
+          offsetX <=ele.offsetX + ele.width &&
+          offsetY >=ele.offsetY &&
+          offsetY <=ele.offsetY + ele.height
+        )
+      }
+      if(ele.type == 'circle' || ele.type === 'ellipse'){
+        const dist = Math.sqrt(
+          Math.pow(offsetX - ele.offsetX, 2) + Math.pow(offsetY - ele.offsetY, 2)
+        );
+        return dist <= ele.width / 2; 
+
+ 
+        // return(
+        //   offsetX >=ele.offsetX &&
+        //   offsetX <=ele.offsetX + ele.width &&
+        //   offsetY >=ele.offsetY - ele.height &&
+        //   offsetY <=ele.offsetY
+        // ) 
+
+
+        // const radiusX = Math.abs(ele.width) / 2;
+        // const radiusY = Math.abs(ele.height) / 2;
+        // const centerX = ele.offsetX + radiusX;
+        // const centerY = ele.offsetY + radiusY;
+        // return (
+        //   Math.pow(offsetX - centerX, 2) / Math.pow(radiusX, 2) +
+        //   Math.pow(offsetY - centerY, 2) / Math.pow(radiusY, 2) <=
+        //   1
+        // );
+      }else if(ele.type == 'rectangle'){ 
+        return(
+          offsetX >=ele.offsetX &&
+          offsetX <=ele.offsetX + ele.width &&
+          offsetY >=ele.offsetY &&
+          offsetY <=ele.offsetY + ele.height
+        )
+      }else if(ele.type == 'text'){
+        const textWidth = contextRef.current.measureText(ele.text).width;
+        const textHeight = ele.fontSize;
+        return( 
+          offsetX >=ele.offsetX &&
+          offsetX <=ele.offsetX + textWidth &&
+          offsetY >=ele.offsetY - textHeight &&
+          offsetY <=ele.offsetY
+        )
+      }
+      return false;
+    })
+ 
+    if(clickedElement !== -1){
+      setSelectedElement(clickedElement);
+      setIsDrawing(true);
+    }
+    else {
+      if(tool == 'pencil'){
+        setElements((prevElements)=>[
+          ...prevElements,
           {
-            type: 'text',
-            text: newText,
+            type:"pencil",
+            offsetX, 
+            offsetY,
+            path:[[offsetX, offsetY]], 
+            stroke:color,
+            strokeWidth:strokeWidth,
+            strokeLineDash:strokeStyle,
+            seed:20
+          }
+        ])
+      }else if(tool == 'line'){
+        setElements((prevElements)=>[
+          ...prevElements,
+          {
+            type:"line",
             offsetX,
             offsetY,
-            stroke: color,
-            fontSize: fontSize,
-            fontFamily:fontFamily
+            width: offsetX,
+            height: offsetY,
+            stroke:color,
+            strokeWidth:strokeWidth,
+            strokeLineDash:strokeStyle,
           }
-        ]);
-      }
-    } 
+        ])
+      }else if(tool == 'circle'){
+        setElements((prevElements)=>[
+          ...prevElements,
+          {
+            type:"circle",
+            offsetX,
+            offsetY,
+            width: 0,
+            height: 0,
+            stroke:color,
+            strokeWidth:strokeWidth,
+            fill:backgroundColor,
+            fillStyle:fillStyle,
+            strokeLineDash: strokeStyle,
+            hachureGap:fillGap
+          }
+        ])
+      }else if(tool == 'ellipse'){
+        setElements((prevElements)=>[
+          ...prevElements,
+          {
+            type:"ellipse",
+            offsetX,
+            offsetY,
+            width: 0,
+            height: 0,
+            stroke:color,
+            strokeWidth:strokeWidth,
+            fill:backgroundColor,
+            fillStyle:fillStyle,
+            strokeLineDash: strokeStyle,
+            hachureGap:fillGap
+          }
+        ])
+      }else if(tool == 'rectangle'){
+        setElements((prevElements)=>[
+          ...prevElements,
+          {
+            type:"rectangle",
+            offsetX,
+            offsetY,
+            width: 0,
+            height: 0,
+            stroke:color,
+            strokeWidth:strokeWidth,
+            fill:backgroundColor,
+            fillStyle:fillStyle,
+            strokeLineDash: strokeStyle,
+            hachureGap:fillGap
+          }
+        ])
+      }else if(tool == 'text'){
+        const newText = window.prompt('Enter text:', '');
+        if (newText) {
+          setElements((prev) => [
+            ...prev,
+            {
+              type: 'text',
+              text: newText,
+              offsetX,
+              offsetY,
+              stroke: color,
+              fontSize: fontSize,
+              fontFamily:fontFamily
+            }
+          ]);
+        }
+      } 
+    }
+
 
     setIsDrawing(true);
   }
+
+
   const handleMouseUp = (e)=>{
     setIsDrawing(false);
+    setSelectedElement(null);
   }
-  const handleMouseMove= (e)=>{
-    const{offsetX, offsetY} = e.nativeEvent
-    if(isDrawing){
-      if(tool == 'pencil'){
-        const {path} = elements[elements.length-1]
-        const newPath = [...path, [offsetX, offsetY]]
-        setElements((prevElements)=>
-          prevElements.map((element, index)=>{
-            if(index == elements.length-1){
-              return {
-                ...element,
-                path:newPath
+
+
+  const handleMouseMove = (e) => {
+    const { offsetX, offsetY } = e.nativeEvent;
+  
+    if (isDrawing ) {
+      // Update position of selected text element
+      if(selectedElement !== null){
+        setElements((prevElements) =>
+          prevElements.map((element, index) => {
+            if(index==selectedElement){
+              if(element.type === 'pencil'){
+                const deltaX = offsetX - element.offsetX;
+                const deltaY = offsetY - element.offsetY;
+
+                const newPath = element.path.map(([x, y]) => [x + deltaX, y + deltaY]);
+                return {
+                  ...element,
+                  path: newPath,
+                  offsetX, 
+                  offsetY
+                } 
               }
-            }else{
-              return element;
-            }
-          })
-        )
-      }else if(tool == 'line'){
-        setElements((prevElements)=>
-          prevElements.map((element, index)=>{
-            if(index == elements.length-1){
-              return {
-                ...element,
-                width:offsetX,
-                height:offsetY
+              else if(element.type === 'line'){
+                return {
+                  ...element,
+                  // width: offsetX - element.offsetX,
+                  // height: offsetY - element.offsetY,
+                  // width: offsetX, 
+                  // height: offsetY,
+                  offsetX: offsetX, 
+                  offsetY: offsetY,
+                } 
               }
-            }else{
-              return element;
-            }
-          })
-        )  
-      }else if(tool == 'circle'){
-        setElements((prevElements)=>
-          prevElements.map((element, index)=>{
-            if(index == elements.length-1){
-              return {
-                ...element,
-                width:offsetX - element.offsetX,
-                height:offsetY - element.offsetY
+              else if(element.type === 'circle' || element.type === 'ellipse'){
+                return {
+                  ...element,
+                  offsetX: offsetX, 
+                  offsetY: offsetY,
+                } 
+              } 
+              else if (element.type === 'rectangle') {
+                return {
+                  ...element,
+                  offsetX: offsetX, 
+                  offsetY: offsetY,
+                }; 
               }
-            }else{
-              return element;
-            }
-          })
-        )  
-      }else if(tool == 'ellipse'){
-        setElements((prevElements)=>
-          prevElements.map((element, index)=>{
-            if(index == elements.length-1){
-              return {
-                ...element,
-                width:offsetX - element.offsetX,
-                height:offsetY - element.offsetY
+              else if (element.type === 'text') {
+                return {
+                  ...element,
+                  offsetX: offsetX, 
+                  offsetY: offsetY, 
+                };
               }
-            }else{
-              return element;
             }
+            return element; 
           })
-        )  
-      }else if(tool == 'rectangle'){
-        setElements((prevElements)=>
-          prevElements.map((element, index)=>{
-            if(index == elements.length-1){
-              return {
-                ...element,
-                // width:offsetX,
-                // height:offsetY
-                width:offsetX - element.offsetX,
-                height:offsetY - element.offsetY
+        );
+      }else {
+        if(tool == 'pencil'){
+          const {path} = elements[elements.length-1]
+          const newPath = [...path, [offsetX, offsetY]]
+          setElements((prevElements)=>
+            prevElements.map((element, index)=>{
+              if(index == elements.length-1){
+                return {
+                  ...element,
+                  path:newPath
+                }
+              }else{
+                return element;
               }
-            }else{
-              return element;
-            }
-          })
-        )  
-      }else if(tool == 'text'){
-        setElements((prevElements)=>
-          prevElements.map((element, index)=>{
-            if(index == elements.length-1){
-              return {
-                ...element,
-                width:offsetX,
-                height:offsetY
+            })
+          )
+        }else if(tool == 'line'){
+          setElements((prevElements)=>
+            prevElements.map((element, index)=>{
+              if(index == elements.length-1){
+                return {
+                  ...element,
+                  width:offsetX,
+                  height:offsetY
+                }
+              }else{
+                return element;
+              } 
+            })
+          )  
+        }else if(tool == 'circle'){
+          setElements((prevElements)=>
+            prevElements.map((element, index)=>{
+              if(index == elements.length-1){
+                return {
+                  ...element, 
+                  width:offsetX - element.offsetX,
+                  height:offsetY - element.offsetY
+                }
+                // const radius = Math.sqrt(
+                //   Math.pow(offsetX - element.offsetX, 2) + Math.pow(offsetY - element.offsetY, 2)
+                // );
+                // return {
+                //   ...element,
+                //   width: radius * 2, // Update diameter
+                //   height: radius * 2,
+                // };
+              }else{
+                return element;
               }
-            }else{
-              return element;
-            }
-          })
-        )  
+            })
+          )  
+        }else if(tool == 'ellipse'){
+          setElements((prevElements)=>
+            prevElements.map((element, index)=>{
+              if(index == elements.length-1){
+                return {
+                  ...element,
+                  width:offsetX - element.offsetX,
+                  height:offsetY - element.offsetY
+                }
+              }else{
+                return element;
+              }
+            })
+          )  
+        }else if(tool == 'rectangle'){
+          setElements((prevElements)=>
+            prevElements.map((element, index)=>{
+              if(index == elements.length-1){
+                return {
+                  ...element,
+                  // width:offsetX,
+                  // height:offsetY
+                  width:offsetX - element.offsetX,
+                  height:offsetY - element.offsetY
+                }
+              }else{
+                return element;
+              }
+            })
+          )  
+        }else if(tool == 'text'){
+          setElements((prevElements)=>
+            prevElements.map((element, index)=>{
+              if(index == elements.length-1){
+                return {
+                  ...element,
+                  width:offsetX,
+                  height:offsetY
+                }
+              }else{
+                return element;
+              }
+            })
+          )  
+        }
       }
-
     }
-  }
+  };
 
-  if(userId == hostId){
+  if(userId == hostId){ 
     return (
       <div className='relative'>
       {isOpen && (
@@ -415,14 +538,14 @@ const Board=({
                 />
             </div>
             <div className=' border-b border-gray-700 pb-2 mb-2'>
-              <label className='text-xs ' htmlFor="">Select Fill</label>
-              <select  onClick={(e)=>setFillStyle(e.target.value)} className="bg-zinc-800 p-2 ml-2 rounded">
-                <option value="hachure">hachure </option>
-                <option value="solid">solid </option>
-                <option value="zigzag">zigzag </option>
-                <option value="cross-hatch">cross-hatch </option>
-                <option value="dashed">dashed </option>
-              </select>
+                <label className='text-xs ' htmlFor="">Select Fill</label>
+                <select  onClick={(e)=>setFillStyle(e.target.value)} className="bg-zinc-800 p-2 ml-2 rounded">
+                  <option value="hachure">hachure </option>
+                  <option value="solid">solid </option>
+                  <option value="zigzag">zigzag </option>
+                  <option value="cross-hatch">cross-hatch </option>
+                  {/* <option value="dashed">dashed </option> */}
+                </select>
             </div>
             <div className=' border-b border-gray-700 pb-2 mb-2'>
               <label className='text-xs ' htmlFor="">Select Stroke Width</label>
@@ -430,7 +553,7 @@ const Board=({
                 <option value="2">Extra Thin </option>
                 <option value="4">Thin </option>
                 <option value="6">Bold </option>
-                <option value="8">Extra Bold </option>
+                <option value="8">Extra Bold </option> 
               </select>
             </div>
             <div className=' border-b border-gray-700 pb-2 mb-2'>
@@ -444,20 +567,24 @@ const Board=({
               <label className='text-xs ' htmlFor="">Select Fill Gap</label>
               <input onClick={(e)=>setFillGap(e.target.value)} type="range" min={3} max={20} step={1} className="bg-zinc-800  ml-2 rounded"/>
             </div>
-            <div className='flex py-3 border-b border-gray-700 mb-2'>
-              <label className='text-xs ' htmlFor="">Select Font Size</label>
-              <input onClick={(e)=>setFontSize(e.target.value)} type="range" min={10} max={100} step={1} className="bg-zinc-800  ml-2 rounded"/>
-            </div>
-            <div className=' border-b border-gray-700 pb-2 mb-2'>
-              <label className='text-xs' htmlFor="">Select Font Family</label>
-              <select onClick={(e)=>setFontFamily(e.target.value)} type=""  step={1} className="bg-zinc-800 p-2 ml-2 rounded">
-                {fonts.map((font, ind)=>(
-                  <option index={ind} value={font}>
-                    {font}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {tool=='text' && (
+              <div>
+                <div className='flex py-3 border-b border-gray-700 mb-2'>
+                  <label className='text-xs ' htmlFor="">Select Font Size</label>
+                  <input onClick={(e)=>setFontSize(e.target.value)} type="range" min={10} max={100} step={1} className="bg-zinc-800  ml-2 rounded"/>
+                </div>
+                <div className=' border-b border-gray-700 pb-2 mb-2'>
+                  <label className='text-xs' htmlFor="">Select Font Family</label>
+                  <select onClick={(e)=>setFontFamily(e.target.value)} type=""  step={1} className="bg-zinc-800 p-2 ml-2 rounded">
+                    {fonts.map((font, ind)=>(
+                      <option index={ind} value={font}>
+                        {font}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
         </div>  
       </motion.div>
