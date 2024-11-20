@@ -10,7 +10,7 @@ import { TbOvalVertical } from "react-icons/tb";
 import { ImUndo2 } from "react-icons/im";
 import { ImRedo2 } from "react-icons/im";
 import { FcDeleteDatabase } from "react-icons/fc";
-import { IoTextSharp } from "react-icons/io5";
+import { FaImages } from "react-icons/fa";
 import { CiText } from "react-icons/ci";
 
 
@@ -29,6 +29,7 @@ const WhiteBoard = ({
     const[isRedoDisabled, setIsRedoDisabled] = useState(true)
     const[isUndoDisabled, setIsUndoDisabled] = useState(true)
     const[isOpen, setIsOpen] = useState(false)
+    const[fileOpen, setFileOpen] = useState(false)
 
     // useEffect(()=>{
     //     if(history.length >= 1){
@@ -61,7 +62,7 @@ const WhiteBoard = ({
     const handleClearBoard = ()=>{
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
-        context.fillRect = 'white'
+        context.fillRect = 'black'
         contextRef.current.clearRect(
             0,
             0,
@@ -206,25 +207,24 @@ const WhiteBoard = ({
                     </label>
                 </div>
 
-                {/* </div> */}
-                {/* <div className='mt-1'>
-                    <input 
-                        type="color"
-                        id='color'
-                        value={color} 
-                        className='rounded-sm ms-2 cursor-pointer'
-                        onChange={(e)=> setColor(e.target.value)}
-                    />
-                </div> */}
-                {/* <div className='mt-1'>
-                    <input 
-                        type="color"
-                        id='backgroundColor'
-                        value={backgroundColor} 
-                        className='rounded-sm ms-2 cursor-pointer'
-                        onChange={(e)=> setBackgroundColor(e.target.value)}
-                    />
-                </div> */}
+                <div 
+                    className='flex'
+                    onClick={()=>{
+                        setFileOpen(true)
+                    }}
+                >
+                    <label htmlFor="image" className={`cursor-pointer hover:bg-gray-800 rounded-lg px-[6px] ${tool == "image"? "bg-gray-700 rounded-lg px-[6px] ":"bg-transparent"} `}>
+                        <input
+                            type="radio" 
+                            name="tool"
+                            id="image"
+                            value="image"
+                            className='hidden'  
+                            onChange={(e) => setTool(e.target.value)}
+                        />
+                        <FaImages className='mt-2' /> 
+                    </label>
+                </div>
                 
                 <div
                     disabled={elements.length == 0}
@@ -265,11 +265,13 @@ const WhiteBoard = ({
 
         </div>):
       (
-        <div className=' text-xl ml-1 text-gray-400'>Real time white board image shared by presenter</div>
+        <div className=' text-xl ml-1 text-gray-400'>Real time board image shared by presenter</div>
       )
       }
       <div className='mt-2'> 
         <Board 
+            fileOpen={fileOpen}
+            setFileOpen={setFileOpen}
             isOpen={isOpen}
             setIsOpen={setIsOpen}
             canvasRef={canvasRef} 

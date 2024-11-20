@@ -17,4 +17,4 @@ export const CODE_SNIPPETS = {
   php: "<?php\n\n$name = 'Alex';\necho $name;\n",
 };
 
-export const LISTS = ["Code-Editor","White-Board","Chat"]
+export const LISTS = ["Code-Editor","Board","Chat"]

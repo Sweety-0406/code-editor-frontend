@@ -28,7 +28,7 @@ const HomePage = ()=>{
             </div>
             <div className="text-white xl:px-[10%]">
                 <div className="text-center items-center">
-                    <h2 className=" text-transparent font-extrabold bg-clip-text bg-gradient-to-l from-blue-600 to-green-600 text-clip bg-transparent  text-4xl mt-20  ">
+                    <h2 className=" text-transparent font-extrabold bg-clip-text bg-gradient-to-l from-blue-600 to-green-600  text-clip bg-transparent  text-4xl mt-20  ">
                         WELCOME TO ALL-IN-ONE
                     </h2>
                     <p>

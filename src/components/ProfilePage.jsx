@@ -25,12 +25,11 @@ const ProfilePage = ({groupId,groupMembers, clickHandler, choice})=>{
                         </div>
                     </div>
                 }
-                {choice =='white-board' && 
+                {choice =='board' && 
                     <div className="flex text-purple-500">
                         <PiChalkboardSimpleBold className='size-8' />
                         <div className='flex '>
-                            <div className="hidden xl:block ml-2 my-auto">White Board</div>
-                            <div className="block xl:hidden ml-2 my-auto">Board</div>
+                            <div className=" xl:block ml-2 my-auto"> Board</div>
                         </div>
                     </div>
                 }

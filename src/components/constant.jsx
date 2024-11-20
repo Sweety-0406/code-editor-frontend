@@ -1,1 +1,1 @@
-export default lists = ["Code-Editor","White-Board","Chat"]
+export default lists = ["Code-Editor","Board","Chat"]

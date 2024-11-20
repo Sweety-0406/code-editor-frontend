@@ -38,7 +38,7 @@ const Navbar = ()=>{
                                     if(groupId && username && userId){
                                         navigate(`/group?choice=${list.toLowerCase()}&id=${groupId}&username=${username}&userId=${userId}`);
                                     }else{
-                                        navigate(`/${list.toLowerCase()}`)
+                                        navigate(`/${list.toLowerCase()}/?choice=${list.toLowerCase()}`)
                                     }
                                 }}
                             >
